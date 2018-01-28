@@ -72,6 +72,10 @@ for ($i=0; $i<$max; $i++) {
   $honbun.= $shokei."円 \n";
 }
 
+$sql = 'LOCK TABLES dat_sales WRITE,dat_sales_product WRITE';
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+
 $sql = 'INSERT INTO dat_sales(code_member,name,email,postal1,postal2,address,tel)
 VALUES(?,?,?,?,?,?,?)';
 $stmt = $dbh->prepare($sql);
@@ -102,6 +106,17 @@ for ($i=0; $i<$max; $i++) {
   $data[] = $kazu[$i];
   $stmt->execute($data);
 }
+
+$sql = 'UNLOCK TABLES';
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+
+//カート削除？？
+$_SESSION = array();
+if (isset($_COOKIE[session_name()]) == true) {
+  setcookie(session_name(), '', time()-42000, '/');
+}
+session_destroy();
 
 $dbh = null;
 
@@ -143,5 +158,7 @@ mb_send_mail('info@rokumarunouen.co.jp', $title, $honbun, $header);
 
  ?>
 
+<br>
+<a href="shop_list.php">商品画面へ</a>
   </body>
 </html>
